@@ -1,0 +1,85 @@
+flowchart TB
+    %% تعریف استایل‌ها
+    classDef dataClass fill:#f9f,stroke:#333,stroke-width:2px
+    classDef algorithmClass fill:#bbf,stroke:#333,stroke-width:2px
+    classDef visualClass fill:#bfb,stroke:#333,stroke-width:2px
+    classDef mainClass fill:#fbb,stroke:#333,stroke-width:2px
+    classDef resultClass fill:#ff9,stroke:#333,stroke-width:2px
+
+    %% تعریف نودها
+    main["main.py\n(فایل اصلی اجرای برنامه)"] :::mainClass
+    mapData["map_data.py\n(داده‌های نقشه ایران)"] :::dataClass
+    cspSolver["csp_solver.py\n(پیاده‌سازی الگوریتم‌های CSP)"] :::algorithmClass
+    visualization["visualization.py\n(نمایش گرافیکی نقشه)"] :::visualClass
+
+    %% داده‌های اصلی
+    provinces["PROVINCES\n(لیست استان‌های ایران)"] :::dataClass
+    neighbors["NEIGHBORS\n(همسایگی استان‌ها)"] :::dataClass
+    colors["COLORS\n(رنگ‌های مجاز)"] :::dataClass
+
+    %% الگوریتم‌های CSP
+    mapColoringCSP["MapColoringCSP\n(کلاس اصلی حل مسئله)"] :::algorithmClass
+    backtracking["Backtracking\n(الگوریتم جستجوی پسگرد)"] :::algorithmClass
+    forwardChecking["Forward Checking\n(بررسی محدودیت‌های آینده)"] :::algorithmClass
+    mrv["MRV\n(انتخاب متغیر با کمترین مقادیر باقیمانده)"] :::algorithmClass
+    degreeHeuristic["Degree Heuristic\n(انتخاب متغیر با بیشترین محدودیت)"] :::algorithmClass
+    ac3["AC-3\n(الگوریتم سازگاری قوس‌ها)"] :::algorithmClass
+
+    %% نمایش گرافیکی
+    mapVisualizer["MapVisualizer\n(کلاس نمایش گرافیکی نقشه)"] :::visualClass
+    createGraph["_create_graph\n(ایجاد گراف از استان‌ها و همسایگی‌ها)"] :::visualClass
+    visualize["visualize\n(نمایش نقشه رنگ‌آمیزی شده)"] :::visualClass
+
+    %% نتایج
+    solution["Solution\n(راه حل نهایی رنگ‌آمیزی)"] :::resultClass
+    statistics["Statistics\n(آمار اجرای الگوریتم)"] :::resultClass
+    mapImage["Map Image\n(تصویر نقشه رنگ‌آمیزی شده)"] :::resultClass
+
+    %% ارتباطات
+    mapData --> |"استخراج داده‌ها"| provinces
+    mapData --> |"استخراج داده‌ها"| neighbors
+    mapData --> |"استخراج داده‌ها"| colors
+
+    main --> |"دریافت داده‌ها"| provinces
+    main --> |"دریافت داده‌ها"| neighbors
+    main --> |"دریافت داده‌ها"| colors
+
+    main --> |"ایجاد نمونه"| mapColoringCSP
+    provinces --> |"متغیرها"| mapColoringCSP
+    neighbors --> |"محدودیت‌ها"| mapColoringCSP
+    colors --> |"دامنه مقادیر"| mapColoringCSP
+
+    mapColoringCSP --> |"استفاده از"| ac3
+    mapColoringCSP --> |"استفاده از"| backtracking
+    backtracking --> |"استفاده از"| mrv
+    backtracking --> |"استفاده از"| degreeHeuristic
+    backtracking --> |"استفاده از"| forwardChecking
+
+    mapColoringCSP --> |"تولید"| solution
+    mapColoringCSP --> |"تولید"| statistics
+
+    main --> |"دریافت"| solution
+    main --> |"دریافت"| statistics
+
+    main --> |"ایجاد نمونه"| mapVisualizer
+    provinces --> |"استان‌ها"| mapVisualizer
+    neighbors --> |"همسایگی‌ها"| mapVisualizer
+
+    mapVisualizer --> |"استفاده از"| createGraph
+    mapVisualizer --> |"استفاده از"| visualize
+    solution --> |"ورودی"| visualize
+
+    visualize --> |"تولید"| mapImage
+
+    %% جریان کلی برنامه
+    subgraph "جریان کلی برنامه"
+        direction TB
+        step1["1. بارگذاری داده‌های نقشه"] --> step2["2. ایجاد مسئله CSP"] --> step3["3. اجرای الگوریتم حل"] --> step4["4. نمایش نتایج"] --> step5["5. تولید خروجی گرافیکی"]
+    end
+
+    %% جزئیات الگوریتم حل
+    subgraph "جزئیات الگوریتم حل"
+        direction TB
+        alg1["1. اجرای AC-3 برای کاهش دامنه"] --> alg2["2. شروع الگوریتم Backtracking"] --> alg3["3. انتخاب متغیر با MRV و Degree"] --> alg4["4. امتحان مقادیر دامنه"] --> alg5["5. بررسی سازگاری"] --> alg6["6. اعمال Forward Checking"] --> alg7["7. بازگشت در صورت شکست"]
+        alg7 --> |"بازگشت"| alg4
+    end
